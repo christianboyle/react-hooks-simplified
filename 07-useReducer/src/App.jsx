@@ -1,37 +1,58 @@
-import React, { useReducer } from 'react'
+import React, { useReducer, useState } from 'react'
+import Todo from './Todo.jsx'
 
-const ACTIONS = {
-  INCREMENT: 'increment',
-  DECREMENT: 'decrement'
+export const ACTIONS = {
+  ADD_TODO: 'add-todo',
+  TOGGLE_TODO: 'toggle-todo',
+  DELETE_TODO: 'delete-todo'
 }
 
-function reducer(state, action) {
+function reducer(todos, action) {
   switch (action.type) {
-    case ACTIONS.INCREMENT:
-      return { count: state.count + 1 }
-    case ACTIONS.DECREMENT:
-      return { count: state.count - 1 }
+    case ACTIONS.ADD_TODO:
+      return [...todos, newTodo(action.payload.name)]
+    case ACTIONS.TOGGLE_TODO:
+      return todos.map((todo) => {
+        if (todo.id === action.payload.id) {
+          return { ...todo, complete: !todo.complete }
+        }
+        return todo
+      })
+    case ACTIONS.DELETE_TODO:
+      return todos.filter((todo) => todo.id !== action.payload.id)
     default:
-      return state
+      return todos
   }
+}
+
+function newTodo(name) {
+  return { id: Date.now(), name: name, complete: false }
 }
 
 export default function App() {
-  const [state, dispatch] = useReducer(reducer, { count: 0 })
+  const [todos, dispatch] = useReducer(reducer, [])
+  const [name, setName] = useState('')
 
-  function increment() {
-    dispatch({ type: ACTIONS.INCREMENT })
+  function handleSubmit(e) {
+    e.preventDefault()
+    dispatch({ type: ACTIONS.ADD_TODO, payload: { name: name } })
+    setName('')
   }
 
-  function decrement() {
-    dispatch({ type: ACTIONS.DECREMENT })
-  }
+  // console.log(todos)
 
   return (
     <>
-      <button onClick={decrement}>-</button>
-      <span>{state.count}</span>
-      <button onClick={increment}>+</button>
+      <form onSubmit={handleSubmit}>
+        <input
+          type='text'
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+      </form>
+      {todos.map((todo) => {
+        return <Todo key={todo.id} todo={todo} dispatch={dispatch} />
+      })}
     </>
   )
 }

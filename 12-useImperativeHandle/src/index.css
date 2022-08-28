@@ -1,0 +1,4 @@
+button:focus,
+button:focus-visible {
+  outline: 4px solid red;
+}

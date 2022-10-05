@@ -1,4 +1,4 @@
-import ToggleComponent from './1-useToggle/ToggleComponent'
+import ToggleComponent from './ToggleComponent'
 
 function App() {
   return <ToggleComponent />
